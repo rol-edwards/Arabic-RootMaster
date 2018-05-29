@@ -9,14 +9,15 @@ class ArabicGenius extends React.Component{
       showArabic: true,
       results: [],
       vocab: [
-        {arabic: 'ktb', english: 'to write'},
+        /*{arabic: 'ktb', c1: 'k', c2: 't', c3: 'b', english: 'to write'},
         {arabic: 'qr*', english: 'to read'},
         {arabic: '*kl', english: 'to eat'},
         {arabic: '3ml', english: 'to work'},
         {arabic: 'zhb', english: 'to go'},
         {arabic: 'hbb', english: 'to love'},
-        {arabic: 'kwn', english: 'to be'},
-        
+        {arabic: 'kwn', english: 'to be'},*/
+        {arabic: 'qbl', c1: 'q', c2: 'b', c3: 'l', english: 'to accept', forms: ['3', '4']},
+        {arabic: '3dd', c1: '3', c2: 'd', c3: 'd', english: 'to count', forms: ['4', '10']}
       ]
     }
     this.handleLangSwitch = this.handleLangSwitch.bind(this);
@@ -128,7 +129,6 @@ class VocabTable extends React.Component{
     const rows = [];
     const handleAnswer = this.props.handleAnswer;
     const results=this.props.results;
-    console.log('vocab table results: ' + results)
     this.props.vocab.forEach(function(item){
           rows.push(<VocabItem 
                       item={item} 
@@ -146,6 +146,10 @@ class VocabTable extends React.Component{
                 {heading}
                 <th>Translation</th>
                 <th>Correct?</th>
+                <th>II</th>
+                <th>III</th>
+                <th>IV</th>
+                <th>X</th>
               </tr>
             </thead>
             <tbody>{rows}</tbody>
@@ -171,22 +175,54 @@ class VocabItem extends React.Component{
     const item = this.props.item;
     const results = this.props.results;
     const showArabic = this.props.showArabic;
+
     const row = showArabic ? (<td>{item.arabic}</td>) :
         (<td>{item.english}</td>);
+
     const expected = showArabic ? (item.arabic) : (item.english);
-    const answer = showArabic ? (item.english) : (item.arabic)
+    const answer = showArabic ? (item.english) : (item.arabic);
+
     const input = results.indexOf(expected) !== -1 ?
     (<td><p>{answer}</p></td>) :
     (<td><input type='text' onChange={this.handleAnswer}/></td>);
 
     const correct = results.indexOf(expected) !== -1 ?
     (<td>Correct</td>) : (<td></td>);
+
+    const forms = {
+      2: '',
+      3: ['', 'aa', 'i', ''],
+      4: ['aa', '', 'a', ''],
+      10: ['Ista', '', 'a', '']
+    }
+    const createForm = function(c1, c2, c3, template){
+      console.log('form being created');
+      return template[0] + c1 + template[1] + c2 + template[2] + c3 + template[3];
+
+    }
+    const columns = [];
+    console.log(Object.keys(forms))
+    Object.keys(forms).forEach(function(form){
+      console.log('forEach reached, item forms are: ' + item.forms)
+      //console.log(item.forms.indexOf(form))
+      console.log(item.forms.indexOf(form))
+      if (item.forms.indexOf(form) !== -1){
+        console.log('creating form ' + form)
+        const columnString = (createForm(item.c1, item.c2, item.c3, forms[form]))
+        console.log(columnString)
+        columns.push(<td key={item.arabic}>{columnString}</td>)
+      }
+       else {
+        columns.push(<td></td>)
+      }
+    })
     
     return(
       <tr>
         {row}
         {input}
         {correct}
+        {columns}
       </tr>
     )
   }
