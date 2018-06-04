@@ -2,234 +2,269 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class ArabicGenius extends React.Component{
-  constructor(props){
-    super(props);
-    this.state = {
-      showArabic: true,
-      results: [],
-      vocab: [
-        /*{arabic: 'ktb', c1: 'k', c2: 't', c3: 'b', english: 'to write'},
-        {arabic: 'qr*', english: 'to read'},
-        {arabic: '*kl', english: 'to eat'},
-        {arabic: '3ml', english: 'to work'},
-        {arabic: 'zhb', english: 'to go'},
-        {arabic: 'hbb', english: 'to love'},
-        {arabic: 'kwn', english: 'to be'},*/
-        {arabic: 'qbl', c1: 'q', c2: 'b', c3: 'l', english: 'to accept', forms: ['3', '4']},
-        {arabic: '3dd', c1: '3', c2: 'd', c3: 'd', english: 'to count', forms: ['4', '10']}
-      ]
-    }
-    this.handleLangSwitch = this.handleLangSwitch.bind(this);
-    this.handleAnswer = this.handleAnswer.bind(this);
-    this.handleReset = this.handleReset.bind(this)
 
-  }
- 
-  handleLangSwitch(showArabic){
-    this.setState({showArabic: !showArabic, results: []})
-  } 
-  
-  handleReset(){
-    //newArray = [];
-    //vocabToShuffle = newArray.concat(this.state.vocab);
+class ArabicQuiz extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			vocab: this.props.vocab,
+			questionWord: vocab[Math.floor(Math.random() * vocab.length)],
+			score: 0,
+			outOf: 0,
+			gotRight: [],
+			gotWrong: [],
+		}
+		this.handleClick = this.handleClick.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
 
-    this.setState({results: []})
-  }
-  handleAnswer(word, answer){
-    const emptyArray = [];
-    const newResults = emptyArray.concat(this.state.results);
-    if (this.state.showArabic){
-      if (word.english === answer){
-        newResults.push(word.arabic);
-        this.setState({results: newResults})
-        console.log('answer correct, results are now: ' + this.state.results)
-      }
-      else {
-        console.log('answer was incorrect, results should be empty: ' + this.state.results)
-        }
-    }
-    else {
-      if (word.arabic === answer){
-        newResults.push(word.english);
-        this.setState({results: newResults})
-        console.log('answer correct, results are now: ' + this.state.results)
-      }
-      else {
-        console.log('answer was incorrect, results should be empty: ' + this.state.results)
-        }
-    }
-  }
+	handleClick(answer){
+		if (answer === this.state.questionWord){
+			console.log('correct');
+			const gotRight = this.state.gotRight;
+			gotRight.push(answer);
+			this.setState({score: this.state.score + 1, gotRight: gotRight});
 
-  render(){
-    return (
-      <div>
-        <h1>Arabic Genius</h1>
-        <LangSwitch onLangSwitch={this.handleLangSwitch}/>
-        <VocabTable 
-          vocab={this.state.vocab} 
-           showArabic={this.state.showArabic}
-           handleAnswer={this.handleAnswer}
-           results={this.state.results}
-           />
-        <Reset
-          onReset={this.handleReset}
-          />
-        <p>* denotes hamza</p>
-      </div>
-    )
-  }
+		}
+		else {
+			console.log('incorrect')
+			const gotWrong = this.state.gotWrong;
+			gotWrong.push(this.state.questionWord);
+			this.setState({gotWrong: gotWrong})
+		}
+		const questionWord = this.state.questionWord;
+		const newVocab = [];
+		this.state.vocab.forEach(function(word){
+			if (word != questionWord){
+				newVocab.push(word)
+			}
+		})
+		console.log(newVocab)
+		this.setState({vocab: newVocab});
+		console.log(this.state.vocab)
+		this.setState({questionWord: this.state.vocab[Math.floor(Math.random() * this.state.vocab.length)], outOf: this.state.outOf + 1})
+	}
+
+	handleSubmit(){
+		console.log('submitting:' + this.state.gotRight[0].arabic + this.state.gotRight.length);
+		/*
+			http.post('/users_vocab', this.state.gotRight)
+			*/
+	}
+
+	render(){
+		return(
+			<div>
+				<h1>Arabic RootMaster</h1>
+				<Question 
+					word={this.state.questionWord}
+					/>
+				<Score 
+					score={this.state.score}
+					outOf={this.state.outOf}
+				/>
+				<Answers 
+					vocab={this.state.vocab}
+					handleClick={this.handleClick}
+				/>
+				<Submit 
+					onSubmit={this.handleSubmit}
+					/>
+				<ToLearn
+					items={this.state.gotWrong}
+					/>
+
+			</div>
+			)
+	}
 }
 
-class LangSwitch extends React.Component{
-  //props: onLangeSwitch
-  constructor(props){
-    super(props);
-    this.handleLangSwitch = this.handleLangSwitch.bind(this);
-  }
-    handleLangSwitch(e) {
-    this.props.onLangSwitch(e.target.checked)
-  
-  };
-  render(){
-    return (
-      <div>
-        <input 
-          type='checkbox' 
-          id='box' 
-          checked={this.props.showArabic} 
-          onChange={this.handleLangSwitch}
-        />
-        <label htmlFor='box'>Switch language</label>
-      </div>)
-  }
+class Score extends React.Component{
+	render(){
+		return(
+			<h2>Score: {this.props.score}/{this.props.outOf}</h2>
+			)
+	}
+}
+class Question extends React.Component{
+	constructor(props){
+		super(props);
+	}
+
+	render(){
+		return(
+			<h2>{this.props.word.arabic}</h2>)
+	}
 }
 
-class Reset extends React.Component {
-  constructor(props){
-    super(props);
-    this.handleReset = this.handleReset.bind(this)
-  }
+class Answers extends React.Component{
+	//props: vocab
+	constructor(props){
+		super(props);
 
-  handleReset(e){
-    this.props.onReset()
-  }
-  render(){
-    return(
-      <button onClick={this.handleReset}>Reset</button>
-      )
-    
-  }
+	}
+	
+	render(){
+		const handleClick = this.props.handleClick;
+		const answers = [];
+		this.props.vocab.forEach(function(word){
+			answers.push(<Answer 
+				key={word.arabic}
+				ans={word}
+				onClick={handleClick}/>)
+		})
+		return(
+			<div>
+				{answers}
+			</div>
+			)
+	}
 }
 
-class VocabTable extends React.Component{
-  //props are vocab, showArabic, handleAnswer, results
-  render(){
-    const showArabic=this.props.showArabic;
-    const rows = [];
-    const handleAnswer = this.props.handleAnswer;
-    const results=this.props.results;
-    this.props.vocab.forEach(function(item){
-          rows.push(<VocabItem 
-                      item={item} 
-                      showArabic={showArabic} 
-                      key={item.arabic}
-                      onAnswer={handleAnswer}
-                      results={results}
-                    />)
-    })
-    const heading = showArabic ? (<th>Arabic</th>) : (<th>English</th>)
-      return(
-          <table>
-            <thead>
-              <tr>
-                {heading}
-                <th>Translation</th>
-                <th>Correct?</th>
-                <th>II</th>
-                <th>III</th>
-                <th>IV</th>
-                <th>X</th>
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-          </table>
-         
-      )
-  }
+class Answer extends React.Component{
+	//props: onClick, ans
+	constructor(props){
+		super(props);
+		this.handleClick = this.handleClick.bind(this)
+	}
+	handleClick(answer){
+		return this.props.onClick(answer)
+	}
+	render(){
+		return(
+			<button onClick={ () => this.handleClick(this.props.ans)}>
+				{this.props.ans.english}
+			</button>
+			)
+	}
 }
 
-class VocabItem extends React.Component{
-  constructor(props){
-    super(props);
-    this.handleAnswer = this.handleAnswer.bind(this)
-    
-  }
- 
-  handleAnswer(answer){
-    console.log('first answer handler; passing to main component')
-   this.props.onAnswer(this.props.item, answer.target.value)
+class Submit extends React.Component{
+	constructor(props){
+		super(props);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+	handleSubmit(){
+		return this.props.onSubmit();
+	}
+	render(){
+		return(
+			<button onClick={ () => this.handleSubmit()}>QUIT AND SUBMIT RESULTS</button>
+			)
+	}
 }
-  
-  render(){
-    const item = this.props.item;
-    const results = this.props.results;
-    const showArabic = this.props.showArabic;
 
-    const row = showArabic ? (<td>{item.arabic}</td>) :
-        (<td>{item.english}</td>);
+class ToLearn extends React.Component{
+	render(){
+		const list = [];
+		this.props.items.forEach(function(item){
+			list.push(<p>{item.arabic} = {item.english}</p>)
+		})
+		return(
+			<div>
 
-    const expected = showArabic ? (item.arabic) : (item.english);
-    const answer = showArabic ? (item.english) : (item.arabic);
-
-    const input = results.indexOf(expected) !== -1 ?
-    (<td><p>{answer}</p></td>) :
-    (<td><input type='text' onChange={this.handleAnswer}/></td>);
-
-    const correct = results.indexOf(expected) !== -1 ?
-    (<td>Correct</td>) : (<td></td>);
-
-    const forms = {
-      2: '',
-      3: ['', 'aa', 'i', ''],
-      4: ['aa', '', 'a', ''],
-      10: ['Ista', '', 'a', '']
-    }
-    const createForm = function(c1, c2, c3, template){
-      console.log('form being created');
-      return template[0] + c1 + template[1] + c2 + template[2] + c3 + template[3];
-
-    }
-    const columns = [];
-    console.log(Object.keys(forms))
-    Object.keys(forms).forEach(function(form){
-      console.log('forEach reached, item forms are: ' + item.forms)
-      //console.log(item.forms.indexOf(form))
-      console.log(item.forms.indexOf(form))
-      if (item.forms.indexOf(form) !== -1){
-        console.log('creating form ' + form)
-        const columnString = (createForm(item.c1, item.c2, item.c3, forms[form]))
-        console.log(columnString)
-        columns.push(<td key={item.arabic}>{columnString}</td>)
-      }
-       else {
-        columns.push(<td></td>)
-      }
-    })
-    
-    return(
-      <tr>
-        {row}
-        {input}
-        {correct}
-        {columns}
-      </tr>
-    )
-  }
+				<h2>To learn:</h2>
+				{list}
+			</div>
+			)
+	}
 }
+
+
+
+
+const vocab = [ 
+  { arabic: 'حول ', english: 'about' },
+  { arabic: 'فوق ', english: 'above, super-' },
+  { arabic: 'غياب', english: 'absence' },
+  { arabic: 'الإدارة', english: 'administration' },
+  { arabic: 'ستشار', english: 'adviser' },
+  { arabic: 'إيجاب', english: 'affirmative' },
+  { arabic: 'سن', english: 'age' },
+  { arabic: 'كالات', english: 'agencies' },
+  { arabic: 'ولئ', english: 'allegiance' },
+  { arabic: 'حلفاء', english: 'allies' },
+  { arabic: 'بالفعل', english: 'already' },
+  { arabic: 'أيضًا', english: 'also' },
+  { arabic: 'كذلك ', english: 'also (as this)' },
+  { arabic: 'الغضب', english: 'anger' },
+  { arabic: 'ضم ', english: 'annexation' },
+  { arabic: 'اعلن', english: 'announced' },
+  { arabic: 'سنوية', english: 'annual' },
+  { arabic: 'ثم ', english: 'another' },
+  { arabic: 'بويع', english: 'apparent (in context of royalty?)' },
+  { arabic: 'اقتربوا', english: 'aproached' },
+  { arabic: 'فن', english: 'art' },
+  { arabic: 'كما ', english: 'as ' },
+  { arabic: 'اغتيال', english: 'assassination' },
+  { arabic: 'نقابة ', english: 'association' },
+  { arabic: 'على الأقل', english: 'at least' },
+  { arabic: 'هتمام', english: 'attention' },
+  { arabic: 'السلطة', english: 'authority' },
+  { arabic: 'المعركة ', english: 'battle' },
+  { arabic: 'معارك', english: 'battles' },
+  { arabic: 'أصبح', english: 'become' },
+  { arabic: 'صار ', english: 'become' },
+  { arabic: 'ادة', english: 'birth ' },
+  { arabic: 'ميلاده', english: 'birthday' },
+  { arabic: 'منفذ الهجوم', english: 'bomber' },
+  { arabic: 'قصف', english: 'bombing' },
+  { arabic: 'صبي', english: 'boy' },
+  { arabic: 'اتساع', english: 'breadth' },
+  { arabic: 'سد ', english: 'bridge' },
+  { arabic: 'لواء ', english: 'brigade' },
+  { arabic: 'بريطاني ', english: 'British' },
+  { arabic: 'بريطانية ', english: 'British' },
+  { arabic: 'أخي', english: 'brother' },
+  { arabic: 'شقيق ',
+    english: 'brother (emphasises full not half?)' },
+  { arabic: 'تصفح', english: 'browse' },
+  { arabic: 'بناء', english: 'building' },
+  { arabic: 'رصاصات', english: 'bullets' },
+  { arabic: 'حافلة ', english: 'bus' },
+  { arabic: 'غير ', english: 'but' },
+  { arabic: 'ولكن ', english: 'but' },
+  { arabic: 'تدعى', english: 'called' },
+  { arabic: 'عاصمة ', english: 'capital city' },
+  { arabic: 'سيارة', english: 'car' },
+  { arabic: 'رعاية', english: 'care' },
+  { arabic: 'حالة ', english: 'case (in the case of...)' },
+  { arabic: 'القرن', english: 'century' },
+  { arabic: 'شجع', english: 'cheer, comfort' },
+  { arabic: 'حال', english: 'circumstance' },
+  { arabic: 'بلور', english: 'clarify' },
+  { arabic: 'تحالف ', english: 'coalition' },
+  { arabic: 'ساحل', english: 'coast' },
+  { arabic: 'الكلية ', english: 'college' },
+  { arabic: 'قائد ', english: 'commander' },
+  { arabic: 'المفوضية ', english: 'commission' },
+  { arabic: 'جنة ', english: 'committee' },
+  { arabic: 'بلاغ', english: 'communication' },
+  { arabic: 'تماما', english: 'completely' },
+  { arabic: 'ؤتمر ', english: 'conference' },
+  { arabic: 'تآمر', english: 'conspiracy' },
+  { arabic: 'دستور', english: 'constitution' },
+  { arabic: 'بالقنصل ', english: 'consul ' },
+  { arabic: 'شاورات', english: 'consultations' },
+  { arabic: 'بلد', english: 'country' },
+  { arabic: 'للديوان ', english: 'court' },
+  { arabic: 'حرفة', english: 'craft' },
+  { arabic: 'أبي', english: 'dad' },
+  { arabic: 'يوم ', english: 'day' },
+  { arabic: 'فاة ', english: 'death' },
+  { arabic: 'إعلا ', english: 'declaration' },
+  { arabic: 'دلتا', english: 'delta' },
+  { arabic: 'خلع ', english: 'deposition, extraction' },
+  { arabic: 'الصحراء', english: 'desert' },
+  { arabic: 'رغم ', english: 'despite' },
+  { arabic: 'يستغني ', english: 'dispense' },
+]
+
 
 
 ReactDOM.render(
-  <ArabicGenius />,
-  document.getElementById('root')
-);
+	<ArabicQuiz vocab={vocab}/>,
+	document.getElementById('root')
+	)
+
+
