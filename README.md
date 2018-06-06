@@ -1,1 +1,1 @@
-//Arabic multiple choice quiz app using React. Initally just a front end but planning to add back-end that allows user login and supplies progressively harder vocab. 
+Arabic multiple choice quiz app using React. Initally just a front end but planning to add back-end that allows user login and supplies progressively harder vocab. 
