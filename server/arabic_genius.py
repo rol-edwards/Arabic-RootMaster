@@ -1,4 +1,5 @@
 import myConnection
+from app_error import AppError
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
@@ -11,10 +12,10 @@ insert = myConnection.insert
 from flask import render_template
 
 
-@app.route('/')
+"""@app.route('/')
 def test():
 	print 'test called'
-	return jsonify(query('select * from vocab'))
+	return jsonify(insert('select * from vocab', None))"""
 
 @app.route('/vocab', methods=['GET'])
 def getWords():
@@ -43,6 +44,8 @@ def login():
 		queryString = 'select * from users where username = %s'
 		queryData = (username, )
 		response_object = insert(queryString, queryData)
+		if isinstance(response_object, AppError):
+			return response_object.message
 		return jsonify(response_object)
 
 

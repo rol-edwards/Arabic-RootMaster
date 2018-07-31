@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
 import axios from 'axios';
 
 
@@ -64,11 +64,14 @@ class Login extends React.Component{
 	/*handlePassword(input){
 		this.props.onPassword(input.target.value)
 	}*/
+
 	getId(){
 		this.props.onId()
+
 	}
+
 	createUser() {
-		axios.post('http://localhost:5000/users', {username: "jethro_tull", password: "seeddrill", vocab: 20})
+		axios.post('http://localhost:5000/users', {username: "jethro_tull", password: "seeddrill"})
         .then((res) => {
         	console.log('' + res.data[0])
 	        var id = res.data[0];
@@ -88,8 +91,15 @@ class Login extends React.Component{
 	}
 	render(){
 		return(
-			<div>
-				<button onClick={this.createUser}>Create User</button>
+			<div className='quiz_area'>
+
+				<h2>Welcome to Arabic Root Master!</h2>
+				<div>
+					<h2>Sign-up</h2>
+					<label htmlFor='new_username'>Username</label>
+					<input type='text' onChange={this.handleUsername} id='new_username'/>
+					<button >Submit</button>
+				</div>
 				<div>
 					<h2>Login</h2>
 					<label htmlFor='username'>Username</label>
@@ -117,7 +127,7 @@ class Question extends React.Component{
 	render(){
 		console.log('question rendering; question word is ' + JSON.stringify(this.props.word))
 		return(
-			<h2>{this.props.word.arabic}</h2>)
+			<h2 class='question'>{this.props.word.arabic}</h2>)
 	}
 }
 
@@ -131,7 +141,7 @@ class Submit extends React.Component{
 	}
 	render(){
 		return(
-			<button onClick={ () => this.handleSubmit()}>QUIT AND SUBMIT RESULTS</button>
+			<button onClick={ () => this.handleSubmit()} class='questions'>QUIT AND SUBMIT RESULTS</button>
 			)
 	}
 }
@@ -144,7 +154,7 @@ class ToLearn extends React.Component{
 			list.push(<p>{item.arabic} = {item.english}</p>)
 		})
 		return(
-			<div>
+			<div class='quiz_area'>
 
 				<h2>To learn:</h2>
 				{list}
@@ -163,13 +173,47 @@ class GameOver extends React.Component {
 	}
 	render(){
 		return(
-			<div>
-			<h1>Test Complete</h1>
-			<p>You attempted {this.props.outOf} questions and got {this.props.gotRight} correct!</p>
-			<button onClick={this.reset}>Reset</button>
-		</div>
+			<div class='quiz_area'>
+				<h2>Test Complete</h2>
+				<p>You attempted {this.props.outOf} questions and got {this.props.gotRight} correct!</p>
+				<button onClick={this.reset}>Reset</button>
+			</div>
 		)
 		
+	}
+}
+
+class Quiz extends React.Component{
+	constructor(props){
+		super(props);
+	}
+
+	render(){
+		console.log('rendering quiz')
+		return(
+			<div class='quiz_area'>
+						
+				<Question 
+					word={this.props.word}
+					/>
+				<Score 
+					score={this.props.score}
+					outOf={this.props.outOf}
+				/>
+				<div class='answers'>
+					<Answers 
+						vocab={this.props.vocab}
+						handleClick={this.props.handleClick}
+						question={this.props.word}
+					/>
+				</div>
+				<div class='answers'>
+				<Submit 
+					onSubmit={this.props.handleSubmit}
+					/>
+				</div>
+			</div>
+		)
 	}
 }
 
@@ -178,14 +222,13 @@ class ArabicQuiz extends React.Component{
 		super(props);
 		this.state = {
 			username: '',
-			//password: '',
-			id: 63,
-			vocab: [{arabic: 'dummy', english: 'other_dummy'}],
-			//questionWord: {},
+			id: '',
+			loggedin: false,
+			vocab: [{arabic: '', english: ''}],
 			score: 0,
 			outOf: 0,
 			gotRight: [],
-			gotWrong: [{arabic: 'dummy', english: 'other_dummy'}],
+			gotWrong: [{arabic: '', english: ''}],
 			toggle: true,
 		}
 		this.handleClick = this.handleClick.bind(this);
@@ -194,19 +237,9 @@ class ArabicQuiz extends React.Component{
 		this.handleUsername = this.handleUsername.bind(this);
 		//this.handlePassword = this.handlePassword.bind(this);
 		this.getId = this.getId.bind(this);
-		this.reset = this.reset.bind(this);
 		
 	}
-	reset(){
-		this.setState({id: 63,
-			vocab: [{arabic: 'dummy', english: 'other_dummy'}],
-			//questionWord: {},
-			score: 0,
-			outOf: 0,
-			gotRight: [],
-			gotWrong: [{arabic: 'dummy', english: 'other_dummy'}],
-			toggle: true,})
-	}
+
 	handleUsername(username){
 		this.setState({username: username})
 	}
@@ -216,10 +249,16 @@ class ArabicQuiz extends React.Component{
 	}*/
 
 	getId() {
+		console.log('get Id called')
 		axios.post('http://localhost:5000/login', {username: this.state.username})
 		.then((res) => {
+			console.log('this is the data: ' + res.data)
 			console.log('state should change to ' + JSON.stringify(res.data))
-			this.setState({id: res.data[0][0]})
+			if (res.data == 'db error') {
+				alert('db error')
+				return
+			}
+			this.setState({id: res.data[0][0], loggedin: true})
 			this.getVocab()
 		})
 	}
@@ -237,7 +276,9 @@ class ArabicQuiz extends React.Component{
 	          })
 	          //console.log('newVocab: ' + JSON.stringify(newVocab))
 	          //console.log('newVocab[1].arabic is: ' + newVocab[1].arabic);
-	          this.setState({vocab: newVocab});
+	          
+	          	this.setState({vocab: newVocab, toggle: true});
+	        
 	          //console.log('state vocab: ' + JSON.stringify(this.state.vocab));
         })
         .catch((error) => {
@@ -309,102 +350,67 @@ class ArabicQuiz extends React.Component{
 		.then((res) => {
 			var count = JSON.stringify(res.data)
 			console.log('count worked: ' + count)
+			this.setState({outOf: 0, gotRight: [], score: 0})
 		})
 	}
 
 	render(){
-	
-		var questionWord = this.state.vocab[Math.floor(Math.random() * this.state.vocab.length)]
-		console.log('question word is: ' + questionWord)
 
-		/*
-		some diagnostics:
-		console.log('the questionword should be: ' + JSON.stringify(questionWord))
-		console.log('the questionword arabic is: ' + questionWord.arabic)
-		console.log("entering rendering, and the question word is: " + JSON.stringify(questionWord) + ' and the score is ' + this.state.score)*/
-		if(this.state.toggle){
+		//some diagnostics:
+		//console.log('the questionword should be: ' + JSON.stringify(questionWord))
+		//console.log('the questionword arabic is: ' + questionWord.arabic)
+		//console.log("entering rendering, and the question word is: " + JSON.stringify(questionWord) + ' and the score is ' + this.state.score)
+		
+		if (this.state.loggedin){
+
+			if(this.state.toggle){
+
+				var questionWord = this.state.vocab[Math.floor(Math.random() * this.state.vocab.length)]
+				console.log('question word is: ' + questionWord)
+				return(
+					<div>
+						<Quiz 
+							word={questionWord}
+							score={this.state.score}
+							outOf={this.state.outOf}
+							vocab={this.state.vocab}
+							handleClick={this.handleClick}
+							onSubmit={this.handleSubmit}
+						/>
+					</div>
+				)
+			}
+			else {
+				return(
+					<div>
+						<GameOver
+							onReset={this.getId}
+							outOf={this.state.outOf}
+							gotRight={this.state.gotRight.length}
+						/>
+						<ToLearn
+							items={this.state.gotWrong}
+						/>
+					</div>)
+			}
+		}
+		else {
 			return(
 				<div>
-					<h1>Arabic RootMaster</h1>
-					<p>ID is {this.state.id}</p>
 					<Login
 						username={this.state.username}
 						password={this.state.password}
 						onUsername={this.handleUsername}
 						onPassword={this.handlePassword}
 						onId={this.getId}
-						/>
-					<Question 
-						word={questionWord}
-						/>
-					<Score 
-						score={this.state.score}
-						outOf={this.state.outOf}
 					/>
-					<Answers 
-						vocab={this.state.vocab}
-						handleClick={this.handleClick}
-						question={questionWord}
-					/>
-					<Submit 
-						onSubmit={this.handleSubmit}
-						/>
-					
-
 				</div>
 			)
-		}
-		else {
-			return(
-				<div>
-					<GameOver
-						onReset={this.reset}
-						outOf={this.state.outOf}
-						gotRight={this.state.gotRight.length}
-						/>
-					<ToLearn
-						items={this.state.gotWrong}
-						/>
-				</div>)
-		}
-		
-	}
-}
-
-class Welcome extends React.Component{
-	render(){
-		return(
-			<h1>Welcome to Arabic RootMaster!</h1>
-		)
-	}
-}
-
-class IndexPage extends React.Component{
-	constructor(props){
-		super(props);
-	}
-	render(){
-		return(
-			 <Router>
-				<div>
-					<ul>
-						<li>
-							<Link to='/home'>Home</Link>
-						</li>
-						<li>
-							<Link to='/quiz'>Quiz</Link>
-						</li>
-					</ul>
-					<hr/>
-					<Route path='/home' component={Welcome} />
-					<Route path='/quiz' component={ArabicQuiz}/>
-				</div>
-			</Router>
-		)
+		}		
 	}
 }
 
 ReactDOM.render(
-	<IndexPage />,
+	<ArabicQuiz />,
 	document.getElementById('root')
 	)

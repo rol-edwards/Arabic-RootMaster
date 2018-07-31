@@ -1,50 +1,78 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
   margin: 20px;
+  background-color: #f5f9fa;
 }
 
-ol, ul {
-  padding-left: 30px;
+
+
+h1 {
+color: red;
+background-color: none;
+padding: 10px;
+text-align:center;
+font-size: 4em;
+border-color: #D3D3D3;
+  border-width: 1px;
+  border-bottom-style: solid;
+
 }
 
-.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
+
+.quiz_area {
+  background-color: white;
+  margin: 1px;
+  margin-left: 100px;
+  margin-right: 100px;
+  border-color: #D3D3D3;
+  border-width: 1px;
+  border-style: solid;
+  padding: 20px;
+
 }
 
-.status {
-  margin-bottom: 10px;
-}
+.question {
 
-.square {
-  background: #fff;
-  border: 1px solid #999;
-  float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
   text-align: center;
-  width: 34px;
+  font-size: 3em;
+  border-color: #D3D3D3;
+  border-width: 1px;
+  border-bottom-style: solid;
 }
 
-.square:focus {
-  outline: none;
+.answers {
+
+  margin-left: 150px;
+  margin-right: 150px;
+  border-color: #D3D3D3;
+  border-width: 1px;
+  border-bottom-style: solid;
+  padding: 10px;
+
 }
 
-.kbd-navigation .square:focus {
-  background: #ddd;
+.answers button {
+    align-items: flex-start;
+    text-align: center;
+    cursor: default;
+    color: white;
+    background-color: green;
+    box-sizing: border-box;
+    padding: 2px 6px 3px;
+    border-width: 2px;
+    border-style: outset;
+    border-color: buttonface;
+    border-image: initial;
+    font-size: 2em;
+    margin: 10px;
 }
 
-.game {
-  display: flex;
-  flex-direction: row;
-}
-
-.game-info {
-  margin-left: 20px;
+.logo {
+  position: fixed;
+  left:0;
+  top:0;
+  padding-top: 0;
+  padding-left: 0;
+  width: 150px;
+  height: 150px;
 }
