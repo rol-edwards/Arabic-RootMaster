@@ -104,7 +104,7 @@ class Login extends React.Component{
 					<h2>Login</h2>
 					<label htmlFor='username'>Username</label>
 					<input type='text' onChange={this.handleUsername} id='username'/>
-					<button onClick={this.getId}>Submit</button>
+					<button id='button' onClick={this.getId}>Submit</button>
 				</div>
 			</div>
 		)
@@ -127,7 +127,12 @@ class Question extends React.Component{
 	render(){
 		console.log('question rendering; question word is ' + JSON.stringify(this.props.word))
 		return(
-			<h2 class='question'>{this.props.word.arabic}</h2>)
+			<div class='question'>
+				<p class='aladin'>Select translation for: </p>
+				<h2 >{this.props.word.arabic}</h2>
+				
+			</div>
+			)
 	}
 }
 
@@ -354,6 +359,14 @@ class ArabicQuiz extends React.Component{
 		})
 	}
 
+	getRandom(){
+		axios.get('https://www.googleapis.com/youtube/v3/videos?id=9bZkp7q19f0&part=contentDetails')
+		.then((res) => {
+			var info = JSON.stringify(res.data)
+			console.log('this is the data: ' + info)
+		})
+	}
+
 	render(){
 
 		//some diagnostics:
@@ -369,6 +382,7 @@ class ArabicQuiz extends React.Component{
 				console.log('question word is: ' + questionWord)
 				return(
 					<div>
+
 						<Quiz 
 							word={questionWord}
 							score={this.state.score}
@@ -397,6 +411,7 @@ class ArabicQuiz extends React.Component{
 		else {
 			return(
 				<div>
+				
 					<Login
 						username={this.state.username}
 						password={this.state.password}
@@ -404,6 +419,7 @@ class ArabicQuiz extends React.Component{
 						onPassword={this.handlePassword}
 						onId={this.getId}
 					/>
+					<button onClick={this.getRandom}>Get Random</button>
 				</div>
 			)
 		}		

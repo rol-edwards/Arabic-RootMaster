@@ -7,21 +7,30 @@ body {
 
 
 h1 {
-color: red;
-background-color: none;
-padding: 10px;
+  color: red;
+  background-color: none;
+  font-size: 5em;
+  top: 0px;
+  height: 100px;
+  margin: 0;
+  left: 130px;
+  
+  position: fixed;
+  font-family: 'Aladin';
+/*padding: 10px;
 text-align:center;
 font-size: 4em;
 border-color: #D3D3D3;
   border-width: 1px;
-  border-bottom-style: solid;
+  border-bottom-style: solid;*/
 
 }
 
 
 .quiz_area {
+  
   background-color: white;
-  margin: 1px;
+  margin-top: 100px;
   margin-left: 100px;
   margin-right: 100px;
   border-color: #D3D3D3;
@@ -34,14 +43,21 @@ border-color: #D3D3D3;
 .question {
 
   text-align: center;
-  font-size: 3em;
+  font-size: 2em;
   border-color: #D3D3D3;
   border-width: 1px;
   border-bottom-style: solid;
+  margin: 1px;
+
+}
+
+.aladin {
+  font-family: 'Aladin';
+  color: green;
 }
 
 .answers {
-
+  text-align: center;
   margin-left: 150px;
   margin-right: 150px;
   border-color: #D3D3D3;
@@ -52,11 +68,30 @@ border-color: #D3D3D3;
 }
 
 .answers button {
-    align-items: flex-start;
+
+  border: 1px solid #cfcfcf;
+    color: #555;
+    background: #e9e9e9;
+    text-decoration: none;
+    line-height: 2.5em;
+    font-size: 1em;
+    display: inline-block;
+    margin: 0px;
+    cursor: pointer;
+    position: relative;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-shadow: 0 3px 1px #b1b1b1, #fafafa 0 -1px 0;
+    -webkit-box-shadow: 0 3px 1px #b1b1b1, #fafafa 0 -1px 0;
+    box-shadow: 0 3px 1px #b1b1b1, #fafafa 0 -1px 0;
+    margin: 5px;
+
+   /* align-items: flex-start;
     text-align: center;
     cursor: default;
-    color: white;
-    background-color: green;
+    color: black;
+    background-color: white;
     box-sizing: border-box;
     padding: 2px 6px 3px;
     border-width: 2px;
@@ -64,7 +99,7 @@ border-color: #D3D3D3;
     border-color: buttonface;
     border-image: initial;
     font-size: 2em;
-    margin: 10px;
+    margin: 10px;*/
 }
 
 .logo {
@@ -73,6 +108,61 @@ border-color: #D3D3D3;
   top:0;
   padding-top: 0;
   padding-left: 0;
-  width: 150px;
-  height: 150px;
+  width: 100px;
+  height: 100px;
+}
+
+.diminished {
+  font-size: 1em;
+  font-color: red;
+}
+
+.topnav {
+
+  top: 0px;
+  height: 100px;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  background-color: f5f9fa;
+  width: 1200px;
+  left: 100px;
+  color: black;
+  vertical-align: center;
+}
+
+.topnav p {
+  margin-left: 10px;
+}
+
+.topnav span {
+  position: absolute;
+  margin-top: 10px;
+}
+
+.topnav .search {
+  position: absolute;
+  left: 700px;
+}
+
+.topnav .login {
+  position: absolute;
+  right: 10px;
+  color: green;
+  font-family: 'Aladin';
+  font-size: 2em;
+}
+
+.topnav a {
+  text-decoration: none;
+
+}
+
+.right {
+  position: absolute;
+  right: 150px;
+  color: green;
+  font-family: 'Aladin';
+  font-size: 2em;
+  
 }
