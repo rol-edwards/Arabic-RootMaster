@@ -78,10 +78,14 @@ class Login extends React.Component{
 	}
 
 	handleNewUsername(e){
+
+		console.log('login handling username')
 		this.props.handleNewUsername(e.target.value)
 	}
 
 	handleNewPassword(e){
+
+		console.log('login handling username')
 		this.props.handleNewUsername(e.target.value)
 	}
 	render(){
@@ -284,10 +288,12 @@ class ArabicQuiz extends React.Component{
 	}
 
 	handleNewUsername(username){
+		console.log('root handling username')
 		this.setState({new_username: username})
 	}
 
 	handlePassword(password){
+		console.log('root handling password')
 		this.setState({password: password})
 	}
 
@@ -488,7 +494,6 @@ class ArabicQuiz extends React.Component{
 						signup={this.signup}
 						handleNewUsername={this.handleNewUsername}
 						handleNewPassword={this.handleNewPassword}
-
 					/>
 					<button onClick={this.getRandom}>Get Random</button>
 				</div>
