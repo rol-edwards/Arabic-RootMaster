@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
 import axios from 'axios';
+import config from './config.js';
 
 
 class Answer extends React.Component{
@@ -52,9 +53,11 @@ class Answers extends React.Component{
 class Login extends React.Component{
 	constructor(props){
 		super(props);
-		this.createUser = this.createUser.bind(this);
+		this.signup = this.signup.bind(this);
 		this.handleUsername = this.handleUsername.bind(this);
 		this.getId = this.getId.bind(this);
+		this.handleNewUsername = this.handleNewUsername.bind(this);
+		this.handleNewPassword = this.handleNewPassword.bind(this);
 		//this.handlePassword = this.handlePassword.bind(this);
 	}
 	
@@ -70,24 +73,16 @@ class Login extends React.Component{
 
 	}
 
-	createUser() {
-		axios.post('http://localhost:5000/users', {username: "jethro_tull", password: "seeddrill"})
-        .then((res) => {
-        	console.log('' + res.data[0])
-	        var id = res.data[0];
-	        for (var i = 0; i<=20; i++){
-	        	console.log('adding word: ' + i)
-	        	console.log('id is ' + id + res.data)
-	        	axios.post('http://localhost:5000/users_vocab', {user_id: id, word_id: i})
-	        	.then((res) => {
-	        		console.log('word added')
-	        		var result = res.data;
-	        	})
-	        }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+	signup() {
+		this.props.signup()
+	}
+
+	handleNewUsername(e){
+		this.props.handleNewUsername(e.target.value)
+	}
+
+	handleNewPassword(e){
+		this.props.handleNewUsername(e.target.value)
 	}
 	render(){
 		return(
@@ -96,14 +91,46 @@ class Login extends React.Component{
 				<h2>Welcome to Arabic Root Master!</h2>
 				<div>
 					<h2>Sign-up</h2>
-					<label htmlFor='new_username'>Username</label>
-					<input type='text' onChange={this.handleUsername} id='new_username'/>
-					<button >Submit</button>
+					<table>
+						<tr>
+							<td>
+								<label htmlFor='new_username'>Username</label>
+							</td>
+							<td>
+								<input type='text' onChange={this.handleNewUsername} id='new_username'/>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label htmlFor='new_password'>Password</label>
+							</td>
+							<td>
+								<input type='text' onChange={this.handleNewPassword} id='new_password'/>
+							</td>
+						</tr>
+					</table>
+					<button onClick={this.signup}>Submit</button>
 				</div>
 				<div>
 					<h2>Login</h2>
-					<label htmlFor='username'>Username</label>
-					<input type='text' onChange={this.handleUsername} id='username'/>
+						<table>
+						<tr>
+							<td>
+								<label htmlFor='username'>Username</label>
+							</td>
+							<td>
+								<input type='text' onChange={this.handleUsername} id='username'/>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label htmlFor='password'>Password</label>
+							</td>
+							<td>
+								<input type='text' onChange={this.handlePassword} id='password'/>
+							</td>
+						</tr>
+					</table>
 					<button id='button' onClick={this.getId}>Submit</button>
 				</div>
 			</div>
@@ -227,6 +254,7 @@ class ArabicQuiz extends React.Component{
 		super(props);
 		this.state = {
 			username: '',
+			password: '',
 			id: '',
 			loggedin: false,
 			vocab: [{arabic: '', english: ''}],
@@ -235,6 +263,8 @@ class ArabicQuiz extends React.Component{
 			gotRight: [],
 			gotWrong: [{arabic: '', english: ''}],
 			toggle: true,
+			new_username: '',
+			new_password: '',
 		}
 		this.handleClick = this.handleClick.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
@@ -242,6 +272,10 @@ class ArabicQuiz extends React.Component{
 		this.handleUsername = this.handleUsername.bind(this);
 		//this.handlePassword = this.handlePassword.bind(this);
 		this.getId = this.getId.bind(this);
+		this.signup = this.signup.bind(this);
+		this.handlePassword = this.handlePassword.bind(this);
+		this.handleNewUsername = this.handleNewUsername.bind(this);
+		this.handleNewPassword = this.handleNewPassword.bind(this);
 		
 	}
 
@@ -249,13 +283,26 @@ class ArabicQuiz extends React.Component{
 		this.setState({username: username})
 	}
 
+	handleNewUsername(username){
+		this.setState({new_username: username})
+	}
+
+	handlePassword(password){
+		this.setState({password: password})
+	}
+
+	handleNewPassword(password){
+		this.setState({new_password: password})
+	}
+
+
 	/*handlePassword(password) {
 		this.setState(password: password)
 	}*/
 
 	getId() {
 		console.log('get Id called')
-		axios.post('http://localhost:5000/login', {username: this.state.username})
+		axios.post('http://' + config.IP + ':5000/login', {username: this.state.username})
 		.then((res) => {
 			console.log('this is the data: ' + res.data)
 			console.log('state should change to ' + JSON.stringify(res.data))
@@ -269,7 +316,7 @@ class ArabicQuiz extends React.Component{
 	}
 
 	getVocab(){
-		axios.get('http://localhost:5000/users_vocab?id=' + this.state.id)
+		axios.get('http://' + config.IP + ':5000/users_vocab?id=' + this.state.id)
         .then((res) => {
         	console.log('getting users_vocab')
 	        var vocab2 = '';	
@@ -336,7 +383,7 @@ class ArabicQuiz extends React.Component{
 		console.log('word.score: ' + words[i].score)
 		console.log('state id:' + this.state.id)
 		var newScore = words[i].score + 1;
-		axios.put('http://localhost:5000/users_vocab', {user_id: this.state.id, word_id: words[i].id, score: newScore})
+		axios.put('http://' + config.IP + ':5000/users_vocab', {user_id: this.state.id, word_id: words[i].id, score: newScore})
         .then((res) => {
 	        console.log('done')
 	        i = i + 1;
@@ -350,8 +397,28 @@ class ArabicQuiz extends React.Component{
         });
 	}
 
+	signup() {
+		axios.post('http://' + config.IP + ':5000/users', {username: this.state.new_username, password: this.state.new_password})
+        .then((res) => {
+        	console.log('' + res.data[0])
+	        var id = res.data[0];
+	        for (var i = 0; i<=20; i++){
+	        	console.log('adding word: ' + i)
+	        	console.log('id is ' + id + res.data)
+	        	axios.post('http://' + config.IP + ':5000/users_vocab', {user_id: id, word_id: i})
+	        	.then((res) => {
+	        		console.log('word added')
+	        		var result = res.data;
+	        	})
+	        }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+	}
+
 	updateVocab() {
-		axios.get('http://localhost:5000/vocab_count?id=' + this.state.id)
+		axios.get('http://' + config.IP + ':5000/vocab_count?id=' + this.state.id)
 		.then((res) => {
 			var count = JSON.stringify(res.data)
 			console.log('count worked: ' + count)
@@ -418,6 +485,10 @@ class ArabicQuiz extends React.Component{
 						onUsername={this.handleUsername}
 						onPassword={this.handlePassword}
 						onId={this.getId}
+						signup={this.signup}
+						handleNewUsername={this.handleNewUsername}
+						handleNewPassword={this.handleNewPassword}
+
 					/>
 					<button onClick={this.getRandom}>Get Random</button>
 				</div>
