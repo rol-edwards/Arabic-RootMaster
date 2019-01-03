@@ -86,7 +86,7 @@ class Login extends React.Component{
 	handleNewPassword(e){
 
 		console.log('login handling username')
-		this.props.handleNewUsername(e.target.value)
+		this.props.handleNewPassword(e.target.value)
 	}
 	render(){
 		return(
@@ -404,23 +404,35 @@ class ArabicQuiz extends React.Component{
 	}
 
 	signup() {
+		console.log('signing up...')
 		axios.post('http://' + config.IP + ':5000/users', {username: this.state.new_username, password: this.state.new_password})
         .then((res) => {
-        	console.log('' + res.data[0])
+        	console.log('data' + res.data[0])
 	        var id = res.data[0];
 	        for (var i = 0; i<=20; i++){
 	        	console.log('adding word: ' + i)
 	        	console.log('id is ' + id + res.data)
-	        	axios.post('http://' + config.IP + ':5000/users_vocab', {user_id: id, word_id: i})
-	        	.then((res) => {
-	        		console.log('word added')
-	        		var result = res.data;
-	        	})
+	        	this.newVocab(0, this.state.id)
 	        }
         })
         .catch((error) => {
           console.error(error);
         });
+	}
+
+	newVocab(count, id){
+		if (count == 20){
+			return
+		}
+		else {
+			axios.post('http://' + config.IP + ':5000/users_vocab', {user_id: id, word_id: count})
+	    	.then((res) => {
+	    		console.log('word added' + count)
+	    		var result = res.data;
+	    		this.newVocab(count + 1, id)
+	    	})
+		}
+		
 	}
 
 	updateVocab() {

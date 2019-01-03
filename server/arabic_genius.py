@@ -29,6 +29,8 @@ def addUser():
 		print 'request is', request.get_json()
 		username = post_data.get('username')
 		password = post_data.get('password')
+		print 'username is ', username
+		print 'password is ', password
 		queryString = 'insert into users (username, password) values (%s, %s) returning id as id'
 		data = (username, password)
 		print 'query string is ', queryString

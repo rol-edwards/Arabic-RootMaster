@@ -12,9 +12,12 @@ myConnection = psycopg2.connect(host=hostname, user=username, password=password,
 
 def insert(query, data):
 	print 'query called', query
+	print 'data is ', data
 	cur = myConnection.cursor()
 	try:
+		print 'trying'
 		cur.execute(query, data)
+		print 'got to cur'
 		first = cur.fetchall()
 		print 'first is', first
 		myConnection.commit()
